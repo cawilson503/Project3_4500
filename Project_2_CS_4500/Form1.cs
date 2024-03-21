@@ -1,9 +1,10 @@
 /*Opening Comment - Developed in C# on Visual Studio .NET application builder
-The program should show the images of four playing cards chosen by the user. The program should also append the cards drawn categorized
-by date to a text file and scrollable textbox, visible in the program. The date should be in MM/DD/YYYY format. The prgram should also have "The Art Dealer" 
-(a background player) select random cards from the users hand. The user then has to identify the pattern of the Art Dealer's choices.The Art Dealer's choices
-will be appended to the text file with an asterisk (*) around them. 
-Group 4 consists of Jack Elliott, Jonny Stadter, Paul Williams, and Chelsie Wilson.
+ * The program should show the images of four playing cards chosen by the user. 
+ * The cards will then be appraised by an "art dealer" and some of them may be purchased.
+ * Try to find the pattern that the art dealer is following!
+ * The program should also append the cards drawn categorized by date to a text file and scrollable textbox, visible in the program. The date should be in MM/DD/YYYY format. 
+ 
+Group 4 consists of Jack Elliott, Haley Laguna, Jonny Stadter, Paul Williams, and Chelsie Wilson.
 
 Finalized: 3/21/2024
 
@@ -11,7 +12,9 @@ Team Lead: Jonny Stadter
 Lead Programmer: Paul Williams
 Scribe: Jack Elliott
 Designer: Chelsie Wilson
-Tester: Chelsie Wilson
+
+Outside resources used: Microsoft's Desktop Guide to Winforms
+https://learn.microsoft.com/en-us/dotnet/desktop/winforms/overview/?view=netdesktop-8.0
 
 
 Compilation Instructions:
@@ -23,6 +26,7 @@ Compilation Instructions:
 5. Move card image directory 'playingcards' to path above. Please use the playingcards folder included with the project submission, as we have added a card back image
 6. The .exe will be in the net6.0-windows along with all depedencies
 */
+
 namespace Project_2_CS_4500
 {
     public partial class Project2 : Form
