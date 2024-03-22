@@ -31,12 +31,12 @@ namespace Project_2_CS_4500
 {
     public partial class Project2 : Form
     {
+        //for fetching card images JE
         string[] fPathSuit = { "_of_spades", "_of_clubs", "_of_hearts", "_of_diamonds" };
         string[] fPathRank = { "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14" };
-        //For displaying chosen card to user
 
 
-        //For text logging
+        //For text logging JE
         string[] logSuit = { "S", "C", "H", "D" };
         string[] logRank = { "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A" };
 
@@ -83,6 +83,7 @@ namespace Project_2_CS_4500
         }
 
         //Suit buttons JE
+        //Sets suit of currentCard when clicked, and displays in text box
         private void bSpades_Click(object sender, EventArgs e)
         {
             currentCard.setSuit(0);
@@ -108,6 +109,7 @@ namespace Project_2_CS_4500
         }
 
         //Rank buttons JE
+        //Sets rank of currentCard when button is clicked, and displays in text box
         private void b2_Click(object sender, EventArgs e)
         {
             currentCard.setRank(0);
@@ -199,7 +201,10 @@ namespace Project_2_CS_4500
 
             return false;
         }
+
         //Choose button, JE and Jonny Stadter
+        //Displays chosen card when clicked
+        //Uses global hand[] array, calls CardRepeat and artDealer functions
         private void bChoose_Click(object sender, EventArgs e)
         {
             //If current card is complete, display, textlog, and output to scrollable window
@@ -214,7 +219,7 @@ namespace Project_2_CS_4500
                     picBoxes[handTrack].Image = img;
                     picBoxes[handTrack].SizeMode = PictureBoxSizeMode.StretchImage;
 
-                    //text log and textbox, Jonny Stadter
+                    //Populate hand array with card info, for later text logging, Jonny Stadter
                     hand[handTrack] = logRank[currentCard.getRank()] + logSuit[currentCard.getSuit()];
 
                     handTrack++;
@@ -242,7 +247,8 @@ namespace Project_2_CS_4500
             }
         }
 
-        //Used to rest images to card back
+        //Used to rest images to card back JE
+        //Uses global picBoxes array
         public void resetPic()
         {
             var img = System.Drawing.Image.FromFile("./playingcards/cardback.png");
@@ -259,6 +265,9 @@ namespace Project_2_CS_4500
 
         }
 
+        //Jonny Stadter
+        //Initiates card choosing when clicked, resets all picture boxes to card back image
+        //Calls resetPic() function
         private void bNewHand_Click(object sender, EventArgs e)
         {
             tBoxMsg.Text = "Pick a card, any card!";
@@ -286,6 +295,9 @@ namespace Project_2_CS_4500
         }
 
         //ArtDealer method JE
+        //Called by choose button onClick function. "Purchases" all red cards
+        //Marks red cards with asterisks in text output, and flips non-red cards
+        //Uses global hand[] array
         public void artDealer(string[] hand)
         {
             //Check which cards should be bought (for now, all red cards)
