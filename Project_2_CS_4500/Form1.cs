@@ -140,6 +140,10 @@ namespace Project_2_CS_4500
                                 picBoxes[i].Image = Image.FromFile("./playingcards/cardback.png");
                             }
                         }
+                        //Check if the user sucessfully solved a pattern
+                        if (dealer.check(purchasedCards)){
+                            patternSolved();
+                        }
                         //Reset all necessary components
                         tBox1.Text = " ";
                         handTrack = 0;
@@ -208,6 +212,34 @@ namespace Project_2_CS_4500
             tBoxRecord.AppendText(output);
             //and log file
             appendCardsDealt(output);
+        }
+
+        //Function for outputting messages to user when they solve a pattern JE
+        //Also increments the relevant variables in the ArtDealer object
+        //Called by Choose Button function
+        void patternSolved()
+        {
+            //Check if this is the first success on the current pattern
+            if (!dealer.checkSuccess())
+            {
+                dealer.success();
+                tBoxMsg.Text = "The art dealer has purchased all of your cards! When another full hand is purchased, you will have solved this pattern!";
+            }
+            //If it's the second, output relevant message
+            else
+            {
+                dealer.solvedPattern();
+                //IMPLEMENT WRITING PATTERN TO LastWon.txt
+                tBoxMsg.Text = "You've solved pattern " + dealer.getPattern().ToString() + "! Now the dealer will use a new criteria...";
+
+                //If the user has solved the final pattern, output relevant message
+                if (dealer.getPattern() == 6)
+                {
+                    tBoxMsg.Text = "You've solved all the patterns! Congratulations!";
+                    //FOR NOW, JUST RESETTING TO PATTERN 1, NEED TO IMPLEMENT FULL END MESSAGE
+                    dealer.setPattern(0);
+                }
+            }
         }
 
 
@@ -420,23 +452,51 @@ namespace Project_2_CS_4500
     {
 
         int pattern = 0;
-        int currentSuccess = 0;
+        bool currentSuccess = false;
         //Pasted these arrays down here to show how elements correspond to actual cards:
         //string[] logSuit = { "S", "C", "H", "D" };
         //string[] logRank = { "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A" };
 
         int[] faceCards = { 9, 10, 11 };
-        int[] primes = { 2, 3, 5, 7 };
+        int[] primes = { 0, 1, 3, 5 };
 
         public void setPattern(int i)
         {
             pattern = i;
         }
 
+        public int getPattern()
+        {
+            return pattern;
+        }
+
         public void success()
         {
-            currentSuccess++;
+            currentSuccess = true;
         }
+
+        public bool checkSuccess()
+        {
+            return currentSuccess;
+        }
+
+        public void solvedPattern()
+        {
+            pattern++;
+            currentSuccess = false;
+        }
+
+        public bool check(bool[] hand)
+        {
+            foreach(bool b in hand)
+            {
+                if (!b)
+                    return false;
+            }
+            return true;
+        }
+
+
 
 
         public bool[] appraise(int[] ranks, int[] suits)
