@@ -41,6 +41,7 @@ namespace Project_2_CS_4500
         string[] logRank = { "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A" };
 
         Card currentCard = new Card();
+        ArtDealer dealer = new ArtDealer();
 
 
         //Jonny Stadter - initialize info window.
@@ -49,7 +50,8 @@ namespace Project_2_CS_4500
 
         //Arrays for holding hand and picture boxes JE
         int handTrack = 0;
-        public string[] hand = new string[4];
+        public int[] handSuit = new int[4];
+        public int[] handRank = new int[4];
         public PictureBox[] picBoxes = new PictureBox[4];
 
 
@@ -81,6 +83,133 @@ namespace Project_2_CS_4500
                 sw.WriteLine(appendData);
             }
         }
+
+        //Checks if card is already in hand, called by Choose Button
+        //Jack Elliott & Jonny Stadter
+        private bool CardRepeat(int rank, int suit)
+        {
+            for (int i = 0; i < handTrack; i++)
+            {
+                if (rank == handRank[i] && suit == handSuit[i])
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        //Choose button, JE and Jonny Stadter
+        //Displays chosen card when clicked
+        //Uses global hand[] array, calls CardRepeat and artDealer functions
+        private void bChoose_Click(object sender, EventArgs e)
+        {
+            //If current card is complete, display, textlog, and output to scrollable window
+            if (currentCard.isComplete())
+            {
+
+                if (!CardRepeat(currentCard.getRank(), currentCard.getSuit()))
+                {
+                    //Display card, JE
+                    string fPath = "./playingcards/" + fPathRank[currentCard.getRank()] + fPathSuit[currentCard.getSuit()] + ".png";
+                    var img = System.Drawing.Image.FromFile(fPath);
+                    picBoxes[handTrack].Image = img;
+                    picBoxes[handTrack].SizeMode = PictureBoxSizeMode.StretchImage;
+
+                    //Populate hand arrays with card info, for later text logging, Jonny Stadter & Jack Elliott
+                    handSuit[handTrack] = currentCard.getSuit();
+                    handRank[handTrack] = currentCard.getRank();
+
+                    handTrack++;
+                    currentCard.reset();
+
+                    //If the hand is full, call artDealer function and reset everything Jack Elliott
+                    if (handTrack == 4)
+                    {
+                        //Send hand to art dealer, get array of purchased cards
+                        bool[] purchasedCards = dealer.appraise(handRank, handSuit);
+                        tBoxMsg.Text = "The Art Dealer has purchased the face up cards!";
+
+                        //Send hand & array of purchased cards to function to add asterisks & print
+                        printHand(handRank, handSuit, purchasedCards);
+
+                        //Flip cards that weren't purchased
+                        for (int i = 0; i < purchasedCards.Length; i++)
+                        {
+                            if (!purchasedCards[i])
+                            {
+                                picBoxes[i].Image = Image.FromFile("./playingcards/cardback.png");
+                            }
+                        }
+                        //Reset all necessary components
+                        tBox1.Text = " ";
+                        handTrack = 0;
+                        bNewHand.Enabled = true;
+                        panel1.Enabled = false;
+                    }
+
+                }
+                else
+                {
+                    tBoxMsg.Text = "That card is already chosen, please select another combination.";
+                }
+            }
+            else
+            {
+                tBoxMsg.Text = "Your card isn't complete yet!";
+            }
+        }
+
+        //Used to rest images to card back JE
+        //Uses global picBoxes array
+        public void resetPic()
+        {
+            var img = System.Drawing.Image.FromFile("./playingcards/cardback.png");
+
+            for (int i = 0; i < 4; i++)
+            {
+                picBoxes[i].Image = img;
+                picBoxes[i].SizeMode = PictureBoxSizeMode.StretchImage;
+            }
+        }
+
+        //Jonny Stadter
+        //Initiates card choosing when clicked, resets all picture boxes to card back image
+        //Calls resetPic() function
+        private void bNewHand_Click(object sender, EventArgs e)
+        {
+            tBoxMsg.Text = "Pick a card, any card!";
+            tBox1.Clear();
+            resetPic();
+            panel1.Enabled = true;
+            bNewHand.Enabled = false;
+            tBoxRecord.AppendText(Environment.NewLine);
+        }
+
+        private void printHand(int[] rank, int[] suit, bool[] bought)
+        {
+            string output = "";
+            string s;
+
+            for (int i = 0; i < bought.Length; i++)
+            {
+                //Concatenate rank and suit, and then add asterisks to purchased cards
+                s = logRank[rank[i]] + logSuit[suit[i]];
+                if (bought[i])
+                    s = ("*" + s + "*");
+
+                //Add a comma + space to all but the last element
+                if (i != bought.Length - 1)
+                    s += ", ";
+
+                //Add s to full output string 
+                output += s;
+            }
+            //Output string to scroll box
+            tBoxRecord.AppendText(output);
+            //and log file
+            appendCardsDealt(output);
+        }
+
 
         //Suit buttons JE
         //Sets suit of currentCard when clicked, and displays in text box
@@ -188,96 +317,13 @@ namespace Project_2_CS_4500
         }
 
         //Jonny Stadter, checks if any cards are duplicate combinations
-        private bool CardRepeat(int handTrack)
-        {
-            hand[handTrack] = logRank[currentCard.getRank()] + logSuit[currentCard.getSuit()];
-            for (int i = 0; i < handTrack; i++)
-            {
-                if (hand[handTrack] == hand[i])
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        //Choose button, JE and Jonny Stadter
-        //Displays chosen card when clicked
-        //Uses global hand[] array, calls CardRepeat and artDealer functions
-        private void bChoose_Click(object sender, EventArgs e)
-        {
-            //If current card is complete, display, textlog, and output to scrollable window
-            if (currentCard.isComplete())
-            {
-
-                if (!CardRepeat(handTrack))
-                {
-                    //Display card, JE
-                    string fPath = "./playingcards/" + fPathRank[currentCard.getRank()] + fPathSuit[currentCard.getSuit()] + ".png";
-                    var img = System.Drawing.Image.FromFile(fPath);
-                    picBoxes[handTrack].Image = img;
-                    picBoxes[handTrack].SizeMode = PictureBoxSizeMode.StretchImage;
-
-                    //Populate hand array with card info, for later text logging, Jonny Stadter
-                    hand[handTrack] = logRank[currentCard.getRank()] + logSuit[currentCard.getSuit()];
-
-                    handTrack++;
-                    currentCard.reset();
-
-                    //If the hand is full, call artDealer function and reset everything
-                    if (handTrack == 4)
-                    {
-                        artDealer(hand);
-                        tBox1.Text = " ";
-                        handTrack = 0;
-                        bNewHand.Enabled = true;
-                        panel1.Enabled = false;
-                    }
-
-                }
-                else
-                {
-                    tBoxMsg.Text = "That card is already chosen, please select another combination.";
-                }
-            }
-            else
-            {
-                tBoxMsg.Text = "Your card isn't complete yet!";
-            }
-        }
-
-        //Used to rest images to card back JE
-        //Uses global picBoxes array
-        public void resetPic()
-        {
-            var img = System.Drawing.Image.FromFile("./playingcards/cardback.png");
-
-            for (int i = 0; i < 4; i++)
-            {
-                picBoxes[i].Image = img;
-                picBoxes[i].SizeMode = PictureBoxSizeMode.StretchImage;
-            }
-        }
 
         private void panel1_Paint(object sender, PaintEventArgs e)
         {
 
         }
 
-        //Jonny Stadter
-        //Initiates card choosing when clicked, resets all picture boxes to card back image
-        //Calls resetPic() function
-        private void bNewHand_Click(object sender, EventArgs e)
-        {
-            tBoxMsg.Text = "Pick a card, any card!";
-            tBox1.Clear();
-            resetPic();
-            panel1.Enabled = true;
-            bNewHand.Enabled = false;
-            tBoxRecord.AppendText(Environment.NewLine);
 
-        }
 
         private void tBoxMsg_TextChanged(object sender, EventArgs e)
         {
@@ -293,48 +339,6 @@ namespace Project_2_CS_4500
         {
 
         }
-
-        //ArtDealer method JE
-        //Called by choose button onClick function. "Purchases" all red cards
-        //Marks red cards with asterisks in text output, and flips non-red cards
-        //Uses global hand[] array
-        public void artDealer(string[] hand)
-        {
-            //Check which cards should be bought (for now, all red cards)
-            string s; //used to parse the second character of the strings directly
-            string output = "";
-            for (int i = 0; i < hand.Length; i++)
-            {
-                
-                s = hand[i];
-                if (s.EndsWith('D') || s.EndsWith('H'))//Only red cards will be purchased
-                {
-                    //Add asterisks to purchased cards
-                    hand[i] = ("*" + hand[i] + "*");
-
-                    //Change border of selected cards
-
-                }
-                else
-                {
-                    picBoxes[i].Image = Image.FromFile("./playingcards/cardback.png");
-                }
-                //Display card in text box
-                output += hand[i];
-                if (i != hand.Length - 1)   //Add commas and a space unless it's the last card
-                    output += ", ";
-            }
-
-            //Output string to scroll box
-            tBoxRecord.AppendText(output);
-            //and log file
-            appendCardsDealt(output);
-
-            
-            tBoxMsg.Text = "The Art Dealer has purchased the face-up cards!";
-        }
-
-
     }
 
 
@@ -408,4 +412,117 @@ namespace Project_2_CS_4500
             rank = -1;
         }
     }
+
+    //ArtDealer class Jack Elliott
+    //Contains all 6 patterns to be check, called by .appraise() method
+    //Also contains List of all previous hands in the pattern
+    public class ArtDealer
+    {
+
+        int pattern = 0;
+        int currentSuccess = 0;
+        //Pasted these arrays down here to show how elements correspond to actual cards:
+        //string[] logSuit = { "S", "C", "H", "D" };
+        //string[] logRank = { "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A" };
+
+        int[] faceCards = { 9, 10, 11 };
+        int[] primes = { 2, 3, 5, 7 };
+
+        public void setPattern(int i)
+        {
+            pattern = i;
+        }
+
+        public void success()
+        {
+            currentSuccess++;
+        }
+
+
+        public bool[] appraise(int[] ranks, int[] suits)
+        {
+            bool[] cardsBought = new bool[4];
+
+            //We can handle patterns 1-5 the same way
+            if (pattern < 5)
+            {
+                for (int i = 0; i < cardsBought.Length; i++)
+                {
+                    cardsBought[i] = pattern1to5(ranks[i], suits[i]);
+                }
+                return cardsBought;
+            }
+            //Pattern 6 needs to be handled on its own
+            else
+            {
+                int max = ranks[0];
+
+                //Find max rank
+                for (int j = 0; j < ranks.Length; j++)
+                {
+                    if (max < ranks[j])
+                        max = ranks[j];
+                }
+
+                //Buy all cards that equal max rank
+                for (int i = 0; i < ranks.Length; i++)
+                {
+                    if (ranks[i] == max)
+                        cardsBought[i] = true;
+                    else
+                        cardsBought[i] = false;
+                }
+                return cardsBought;
+            }
+        }
+
+
+        //Contains patterns 1-5
+        private bool pattern1to5(int rank, int suit)
+        {
+            switch (pattern)
+            {
+                //Pattern 1, purchase all red cards
+                case 0:
+                    if (suit == 2 || suit == 3)
+                        return true;
+                    else
+                        return false;
+
+                //Pattern 2, purchase all clubs
+                case 1:
+                    if (suit == 1)
+                        return true;
+                    else
+                        return false;
+
+                //Pattern 3, purchase all face cards
+                case 2:
+                    for (int i = 0; i < faceCards.Length; i++)
+                    {
+                        if (rank == faceCards[i])
+                            return true;
+                    }
+                    return false;
+
+                //Pattern 4, purchase all single digit cards
+                case 3:
+                    if (rank < 8)
+                        return true;
+                    else
+                        return false;
+                //Pattern 5, purchase all single digit prime cards
+                case 4:
+                    for (int i = 0; i < primes.Length; i++)
+                    {
+                        if (rank == primes[i])
+                            return true;
+                    }
+                    return false;
+                default:
+                    return false;
+            }
+        }
+    }
+
 }
