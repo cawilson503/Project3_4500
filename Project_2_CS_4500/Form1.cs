@@ -520,11 +520,16 @@ namespace Project_2_CS_4500
         private void logHand(int[] ranks, int[] suits)
         {
             //Sort both arrays. This makes checking past hands much easier
-            Array.Sort(ranks);
-            Array.Sort(suits);
+            int[] r = new int[4];
+            int[] s = new int[4];
+            ranks.CopyTo(r, 0);
+            suits.CopyTo(s, 0);
+
+            Array.Sort(r);
+            Array.Sort(s);
 
             //Combine arrays for easier storage
-            int[] a = ranks.Concat(suits).ToArray();
+            int[] a = r.Concat(s).ToArray();
 
             //Add new array to List of past hands.
             pastHands.Add(a);
@@ -533,10 +538,14 @@ namespace Project_2_CS_4500
         public bool checkHand(int[] ranks, int[] suits)
         {
             //Sort and combine the hand in the same way it would be stored
-            Array.Sort(ranks);
-            Array.Sort(suits);
+            int[] r = new int[4];
+            int[] s = new int[4];
+            ranks.CopyTo(r, 0);
+            suits.CopyTo(s, 0);
+            Array.Sort(r);
+            Array.Sort(s);
 
-            int[] a = ranks.Concat(suits).ToArray();
+            int[] a = r.Concat(s).ToArray();
 
             //Check the pastHands List for a match
             foreach (int[] i in pastHands)
