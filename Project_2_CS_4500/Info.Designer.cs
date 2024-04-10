@@ -29,30 +29,32 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Info));
-            label1 = new Label();
-            SuspendLayout();
+            this.label1 = new System.Windows.Forms.Label();
+            this.SuspendLayout();
             // 
             // label1
             // 
-            label1.AccessibleRole = AccessibleRole.None;
-            label1.AutoSize = true;
-            label1.Cursor = Cursors.No;
-            label1.Location = new Point(50, 59);
-            label1.Name = "label1";
-            label1.Size = new Size(662, 195);
-            label1.TabIndex = 0;
-            label1.Text = resources.GetString("label1.Text");
+            this.label1.AccessibleRole = System.Windows.Forms.AccessibleRole.None;
+            this.label1.AutoSize = true;
+            this.label1.Cursor = System.Windows.Forms.Cursors.No;
+            this.label1.Location = new System.Drawing.Point(50, 59);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(748, 240);
+            this.label1.TabIndex = 0;
+            this.label1.Text = resources.GetString("label1.Text");
+            this.label1.Click += new System.EventHandler(this.label1_Click);
             // 
             // Info
             // 
-            AutoScaleDimensions = new SizeF(7F, 15F);
-            AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(800, 450);
-            Controls.Add(label1);
-            Name = "Info";
-            Text = "Info";
-            ResumeLayout(false);
-            PerformLayout();
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.label1);
+            this.Name = "Info";
+            this.Text = "Info";
+            this.ResumeLayout(false);
+            this.PerformLayout();
+
         }
 
         #endregion

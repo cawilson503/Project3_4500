@@ -125,30 +125,44 @@ namespace Project_2_CS_4500
                     //If the hand is full, call artDealer function and reset everything Jack Elliott
                     if (handTrack == 4)
                     {
-                        //Send hand to art dealer, get array of purchased cards
-                        bool[] purchasedCards = dealer.appraise(handRank, handSuit);
-                        tBoxMsg.Text = "The Art Dealer has purchased the face up cards!";
+                        //Check if the hand is a duplicate
+                        if(!dealer.checkHand(handRank, handSuit)){
+                            //Send hand to art dealer, get array of purchased cards
+                            bool[] purchasedCards = dealer.appraise(handRank, handSuit);
+                            tBoxMsg.Text = "The Art Dealer has purchased the face up cards!";
 
-                        //Send hand & array of purchased cards to function to add asterisks & print
-                        printHand(handRank, handSuit, purchasedCards);
+                            //Send hand & array of purchased cards to function to add asterisks & print
+                            printHand(handRank, handSuit, purchasedCards);
 
-                        //Flip cards that weren't purchased
-                        for (int i = 0; i < purchasedCards.Length; i++)
-                        {
-                            if (!purchasedCards[i])
+                            //Flip cards that weren't purchased
+                            for (int i = 0; i < purchasedCards.Length; i++)
                             {
-                                picBoxes[i].Image = Image.FromFile("./playingcards/cardback.png");
+                                if (!purchasedCards[i])
+                                {
+                                    picBoxes[i].Image = Image.FromFile("./playingcards/cardback.png");
+                                }
                             }
+                            //Check if the user sucessfully solved a pattern
+                            if (dealer.check(purchasedCards))
+                            {
+                                patternSolved();
+                            }
+                            //Reset all necessary components
+                            tBox1.Text = " ";
+                            handTrack = 0;
+                            bNewHand.Enabled = true;
+                            panel1.Enabled = false;
                         }
-                        //Check if the user sucessfully solved a pattern
-                        if (dealer.check(purchasedCards)){
-                            patternSolved();
+                        //Output message to user indicating they have chosen a duplicate hand
+                        else
+                        {
+                            tBoxMsg.Text = "You have already chosen that hand in this pattern! Please try again";
+                            tBox1.Text = " ";
+                            handTrack = 0;
+                            bNewHand.Enabled = true;
+                            panel1.Enabled = false;
                         }
-                        //Reset all necessary components
-                        tBox1.Text = " ";
-                        handTrack = 0;
-                        bNewHand.Enabled = true;
-                        panel1.Enabled = false;
+                        
                     }
 
                 }
@@ -453,6 +467,7 @@ namespace Project_2_CS_4500
 
         int pattern = 0;
         bool currentSuccess = false;
+        List<Array> pastHands = new List<Array>();
         //Pasted these arrays down here to show how elements correspond to actual cards:
         //string[] logSuit = { "S", "C", "H", "D" };
         //string[] logRank = { "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A" };
@@ -470,19 +485,24 @@ namespace Project_2_CS_4500
             return pattern;
         }
 
+        //Used to track that the user has succeeded in the current pattern
         public void success()
         {
             currentSuccess = true;
         }
 
+        //Checks if the user has already succeed once on the current pattern
         public bool checkSuccess()
         {
             return currentSuccess;
         }
 
+        //Called when user solves a pattern (2 successes)
         public void solvedPattern()
         {
             pattern++;
+            //Clear the stored hands
+            pastHands.Clear();
             currentSuccess = false;
         }
 
@@ -496,6 +516,36 @@ namespace Project_2_CS_4500
             return true;
         }
 
+        //Adds a hand to the List of past hands, to check for duplicates JE
+        private void logHand(int[] ranks, int[] suits)
+        {
+            //Sort both arrays. This makes checking past hands much easier
+            Array.Sort(ranks);
+            Array.Sort(suits);
+
+            //Combine arrays for easier storage
+            int[] a = ranks.Concat(suits).ToArray();
+
+            //Add new array to List of past hands.
+            pastHands.Add(a);
+        }
+
+        public bool checkHand(int[] ranks, int[] suits)
+        {
+            //Sort and combine the hand in the same way it would be stored
+            Array.Sort(ranks);
+            Array.Sort(suits);
+
+            int[] a = ranks.Concat(suits).ToArray();
+
+            //Check the pastHands List for a match
+            foreach (int[] i in pastHands)
+            {
+                if (a.SequenceEqual(i))
+                    return true;
+            }
+            return false;
+        }
 
 
 
@@ -510,6 +560,10 @@ namespace Project_2_CS_4500
                 {
                     cardsBought[i] = pattern1to5(ranks[i], suits[i]);
                 }
+
+                //Add the hand to the List
+                logHand(ranks, suits);
+
                 return cardsBought;
             }
             //Pattern 6 needs to be handled on its own
@@ -532,6 +586,9 @@ namespace Project_2_CS_4500
                     else
                         cardsBought[i] = false;
                 }
+                //Add the hand to the List
+                logHand(ranks, suits);
+
                 return cardsBought;
             }
         }

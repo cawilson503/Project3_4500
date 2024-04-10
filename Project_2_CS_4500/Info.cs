@@ -26,5 +26,10 @@ namespace Project_2_CS_4500
         {
 
         }
+
+        private void label1_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }
