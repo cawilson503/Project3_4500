@@ -499,7 +499,7 @@ namespace Project_2_CS_4500
                 try
                 {
                     //Read the pattern from the file
-                    pattern = Int32.Parse(sr.ReadLine());
+                    pattern = int.Parse(sr.ReadLine());
                 }
                 catch
                 {
@@ -543,6 +543,7 @@ namespace Project_2_CS_4500
             string output = pattern.ToString();
             sw.WriteLine(output);
             sw.Close();
+            //Reset per-pattern successes
             currentSuccess = false;
         }
 
@@ -559,33 +560,32 @@ namespace Project_2_CS_4500
         //Adds a hand to the List of past hands, to check for duplicates JE
         private void logHand(int[] ranks, int[] suits)
         {
-            //Sort both arrays. This makes checking past hands much easier
-            int[] r = new int[4];
-            int[] s = new int[4];
-            ranks.CopyTo(r, 0);
-            suits.CopyTo(s, 0);
-
-            Array.Sort(r);
-            Array.Sort(s);
-
-            //Combine arrays for easier storage
-            int[] a = r.Concat(s).ToArray();
-
+           //New array that will hold combined ranks/suits
+            int[] a = new int[4];
+           
+            //Concatenate arrays
+            for (int i = 0; i < ranks.Length; i++)
+            {
+                a[i] = int.Parse(ranks[i].ToString() + suits[i].ToString());
+            }
+            //Sort a. Doesn't matter what order they are in now, we want them all to be sorted the same for easy checking
+            Array.Sort(a);
             //Add new array to List of past hands.
             pastHands.Add(a);
         }
 
         public bool checkHand(int[] ranks, int[] suits)
         {
-            //Sort and combine the hand in the same way it would be stored
-            int[] r = new int[4];
-            int[] s = new int[4];
-            ranks.CopyTo(r, 0);
-            suits.CopyTo(s, 0);
-            Array.Sort(r);
-            Array.Sort(s);
+            //New array that will hold combined ranks/suits
+            int[] a = new int[4];
 
-            int[] a = r.Concat(s).ToArray();
+            //Concatenate arrays
+            for (int i = 0; i < ranks.Length; i++)
+            {
+                a[i] = int.Parse(ranks[i].ToString() + suits[i].ToString());
+            }
+            //Sort a so that it matches the order of the stored hands
+            Array.Sort(a);
 
             //Check the pastHands List for a match
             foreach (int[] i in pastHands)
