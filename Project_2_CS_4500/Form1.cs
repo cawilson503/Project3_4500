@@ -29,6 +29,7 @@ Compilation Instructions:
 
 namespace HW_4_CS_4500
 {
+   
     public partial class HW4 : Form
     {
         //for fetching card images JE
@@ -39,6 +40,8 @@ namespace HW_4_CS_4500
         //For text logging JE
         string[] logSuit = { "S", "C", "H", "D" };
         string[] logRank = { "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A" };
+
+        string filepath = "./LastWon.txt";
 
         Card currentCard = new Card();
         ArtDealer dealer = new ArtDealer();
@@ -250,8 +253,10 @@ namespace HW_4_CS_4500
                 if (dealer.getPattern() == 6)
                 {
                     tBoxMsg.Text = "You've solved all the patterns! Congratulations!";
-                    //FOR NOW, JUST RESETTING TO PATTERN 1, NEED TO IMPLEMENT FULL END MESSAGE
                     dealer.setPattern(0);
+                    StreamWriter sw = new StreamWriter(filepath, false);
+                    sw.WriteLine("0");
+                    sw.Close();
                 }
             }
         }
