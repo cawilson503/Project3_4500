@@ -1,4 +1,4 @@
-﻿namespace Project_2_CS_4500
+﻿namespace HW_4_CS_4500
 {
     partial class Info
     {

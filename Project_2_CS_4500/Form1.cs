@@ -8,10 +8,10 @@ Group 4 consists of Jack Elliott, Haley Laguna, Jonny Stadter, Paul Williams, an
 
 Finalized: 3/21/2024
 
-Team Lead: Jonny Stadter
-Lead Programmer: Paul Williams
-Scribe: Jack Elliott
-Designer: Chelsie Wilson
+Team Lead: Chelsie Wilson
+Lead Programmer: Jack Elliott
+Scribe: Paul Williams
+Designer: Jonny Stadter
 
 Outside resources used: Microsoft's Desktop Guide to Winforms
 https://learn.microsoft.com/en-us/dotnet/desktop/winforms/overview/?view=netdesktop-8.0
@@ -27,9 +27,9 @@ Compilation Instructions:
 6. The .exe will be in the net6.0-windows along with all depedencies
 */
 
-namespace Project_2_CS_4500
+namespace HW_4_CS_4500
 {
-    public partial class Project2 : Form
+    public partial class HW4 : Form
     {
         //for fetching card images JE
         string[] fPathSuit = { "_of_spades", "_of_clubs", "_of_hearts", "_of_diamonds" };
@@ -53,7 +53,7 @@ namespace Project_2_CS_4500
         public PictureBox[] picBoxes = new PictureBox[4];
 
 
-        public Project2()
+        public HW4()
         { 
             InitializeComponent();
             info.ShowDialog();

@@ -1,4 +1,4 @@
-namespace Project_2_CS_4500
+namespace HW_4_CS_4500
 {
     internal static class Program
     {
@@ -11,7 +11,7 @@ namespace Project_2_CS_4500
             // To customize application configuration such as set high DPI settings or default font,
             // see https://aka.ms/applicationconfiguration.
             ApplicationConfiguration.Initialize();
-            Application.Run(new Project2());
+            Application.Run(new HW4());
         }
     }
 }

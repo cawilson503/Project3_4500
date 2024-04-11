@@ -13,7 +13,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace Project_2_CS_4500
+namespace HW_4_CS_4500
 {
     public partial class Info : Form
     {
