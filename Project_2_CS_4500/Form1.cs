@@ -45,10 +45,6 @@ namespace Project_2_CS_4500
 
         //Jonny Stadter - initialize info window.
         Info info = new Info();
-    
-
-       
-
 
         //Arrays for holding hand and picture boxes JE
         int handTrack = 0;
@@ -72,14 +68,10 @@ namespace Project_2_CS_4500
             //Jonny Stadter
             //Appends Date to CardsDealt.txt and textbox when app first runs.
             appendCardsDealt(DateTime.Now.ToString("MM/dd/yyyy"));
-            tBoxRecord.AppendText(DateTime.Now.ToString("MM/dd/yyyy\n"));
-           
+            tBoxRecord.AppendText(DateTime.Now.ToString("MM/dd/yyyy\n"));  
         }
 
-        private void Info_startForm(object? sender, EventArgs e)
-        {
-            throw new NotImplementedException();
-        }
+       
 
         //Jonny Stadter, appends info to record file.
         private void appendCardsDealt(string appendData)
@@ -106,13 +98,13 @@ namespace Project_2_CS_4500
 
         //Choose button, JE and Jonny Stadter
         //Displays chosen card when clicked
-        //Uses global hand[] array, calls CardRepeat and artDealer functions
+        //Uses global hand[] array, calls CardRepeat, patternSolved() and several functions from ArtDealer class
         private void bChoose_Click(object sender, EventArgs e)
         {
             //If current card is complete, display, textlog, and output to scrollable window
             if (currentCard.isComplete())
             {
-
+                //Check if the current card is already in the hand
                 if (!CardRepeat(currentCard.getRank(), currentCard.getSuit()))
                 {
                     //Display card, JE
@@ -135,8 +127,7 @@ namespace Project_2_CS_4500
                         if(!dealer.checkHand(handRank, handSuit)){
                             //Send hand to art dealer, get array of purchased cards
                             bool[] purchasedCards = dealer.appraise(handRank, handSuit);
-                            tBoxMsg.Text = "The Art Dealer has purchased the face up cards!";
-
+                           
                             //Send hand & array of purchased cards to function to add asterisks & print
                             printHand(handRank, handSuit, purchasedCards);
 
@@ -148,6 +139,7 @@ namespace Project_2_CS_4500
                                     picBoxes[i].Image = Image.FromFile("./playingcards/cardback.png");
                                 }
                             }
+                            tBoxMsg.Text = "The Art Dealer has purchased the face up cards!";
                             //Check if the user sucessfully solved a pattern
                             if (dealer.check(purchasedCards))
                             {
@@ -159,7 +151,7 @@ namespace Project_2_CS_4500
                             bNewHand.Enabled = true;
                             panel1.Enabled = false;
                         }
-                        //Output message to user indicating they have chosen a duplicate hand
+                        //Output message to user indicating if they chose a duplicate hand
                         else
                         {
                             tBoxMsg.Text = "You have already chosen that hand in this pattern! Please try again";
@@ -209,6 +201,8 @@ namespace Project_2_CS_4500
             tBoxRecord.AppendText(Environment.NewLine);
         }
 
+        //Jack Elliott
+        //Converts hand into a string to be output to text file & scroll window
         private void printHand(int[] rank, int[] suit, bool[] bought)
         {
             string output = "";
@@ -262,7 +256,7 @@ namespace Project_2_CS_4500
             }
         }
 
-
+        //-----------SUIT & RANK BUTTONS--------------------
         //Suit buttons JE
         //Sets suit of currentCard when clicked, and displays in text box
         private void bSpades_Click(object sender, EventArgs e)
@@ -367,15 +361,13 @@ namespace Project_2_CS_4500
             currentCard.setRank(12);
             tBox1.Text = currentCard.toString();
         }
+        //---------END SUIT & RANK BUTTONS-------------------
 
-        //Jonny Stadter, checks if any cards are duplicate combinations
 
         private void panel1_Paint(object sender, PaintEventArgs e)
         {
 
         }
-
-
 
         private void tBoxMsg_TextChanged(object sender, EventArgs e)
         {
@@ -426,6 +418,7 @@ namespace Project_2_CS_4500
             return rank;
         }
 
+        //Converts suit & rank variables into a string to be displayed while choosing a card. Called by all suit & rank buttons
         public string toString()
         {
             string s;
@@ -480,7 +473,7 @@ namespace Project_2_CS_4500
         //string[] logSuit = { "S", "C", "H", "D" };
         //string[] logRank = { "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A" };
 
-        //Used for pattern checking
+        //Used for pattern checking. See the above comment for what these numbers (array elements) correspond to
         int[] faceCards = { 9, 10, 11 };
         int[] primes = { 0, 1, 3, 5 };
 
@@ -566,6 +559,8 @@ namespace Project_2_CS_4500
             //Concatenate arrays
             for (int i = 0; i < ranks.Length; i++)
             {
+                //credit for this one goes to a 2009 Stack Exchange post, shout out to Rex M
+                //https://stackoverflow.com/questions/1014292/concatenate-integers-in-c-sharp
                 a[i] = int.Parse(ranks[i].ToString() + suits[i].ToString());
             }
             //Sort a. Doesn't matter what order they are in now, we want them all to be sorted the same for easy checking
