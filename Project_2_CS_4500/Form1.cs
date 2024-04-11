@@ -43,9 +43,11 @@ namespace Project_2_CS_4500
         Card currentCard = new Card();
         ArtDealer dealer = new ArtDealer();
 
-
         //Jonny Stadter - initialize info window.
-        Info info = new();
+        Info info = new Info();
+    
+
+       
 
 
         //Arrays for holding hand and picture boxes JE
@@ -56,9 +58,10 @@ namespace Project_2_CS_4500
 
 
         public Project2()
-        {
-
+        { 
             InitializeComponent();
+            info.ShowDialog();
+            dealer.parsePattern();
             tBoxMsg.Text = "Starting, click 'New Hand' to get started!";
             picBoxes[0] = pictureBox1;
             picBoxes[1] = pictureBox2;
@@ -70,9 +73,12 @@ namespace Project_2_CS_4500
             //Appends Date to CardsDealt.txt and textbox when app first runs.
             appendCardsDealt(DateTime.Now.ToString("MM/dd/yyyy"));
             tBoxRecord.AppendText(DateTime.Now.ToString("MM/dd/yyyy\n"));
+           
+        }
 
-            info.Show();
-
+        private void Info_startForm(object? sender, EventArgs e)
+        {
+            throw new NotImplementedException();
         }
 
         //Jonny Stadter, appends info to record file.
@@ -467,13 +473,42 @@ namespace Project_2_CS_4500
 
         int pattern = 0;
         bool currentSuccess = false;
-        List<Array> pastHands = new List<Array>();
-        //Pasted these arrays down here to show how elements correspond to actual cards:
+        List<Array> pastHands = new List<Array>();//Tracks past hands during each pattern
+        string filepath = "./LastWon.txt";
+
+        //Pasted these arrays down here to show how elements correspond to actual cards, since everything is handled as integers as long as possible:
         //string[] logSuit = { "S", "C", "H", "D" };
         //string[] logRank = { "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A" };
 
+        //Used for pattern checking
         int[] faceCards = { 9, 10, 11 };
         int[] primes = { 0, 1, 3, 5 };
+
+        //Constructor for ArtDealer
+        public ArtDealer()
+        {
+            
+        }
+
+        //Read pattern from file, if it exists
+        public void parsePattern()
+        {
+            if (File.Exists(filepath))
+            {
+                StreamReader sr = new StreamReader(filepath);
+                try
+                {
+                    //Read the pattern from the file
+                    pattern = Int32.Parse(sr.ReadLine());
+                }
+                catch
+                {
+                    //If something has gone wrong in the file or the read fails, just reset it to zero
+                    pattern = 0;
+                }
+                sr.Close();
+            }
+        }
 
         public void setPattern(int i)
         {
@@ -503,6 +538,11 @@ namespace Project_2_CS_4500
             pattern++;
             //Clear the stored hands
             pastHands.Clear();
+            //Write solved pattern to the file
+            StreamWriter sw = new StreamWriter(filepath, false);
+            string output = pattern.ToString();
+            sw.WriteLine(output);
+            sw.Close();
             currentSuccess = false;
         }
 
