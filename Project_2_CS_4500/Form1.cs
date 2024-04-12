@@ -1,12 +1,13 @@
 /*Opening Comment - Developed in C# on Visual Studio .NET application builder
- * The program should show the images of four playing cards chosen by the user. 
+ * The program will show the images of four playing cards chosen by the user. 
  * The cards will then be appraised by an "art dealer" and some of them may be purchased.
- * Try to find the pattern that the art dealer is following!
+ * Try to find the pattern that the art dealer is following! After the Art Dealer has purchased two full hands, the pattern will change.
+ * There are six in total, try to find them all!
  * The program should also append the cards drawn categorized by date to a text file and scrollable textbox, visible in the program. The date should be in MM/DD/YYYY format. 
  
 Group 4 consists of Jack Elliott, Haley Laguna, Jonny Stadter, Paul Williams, and Chelsie Wilson.
 
-Finalized: 3/21/2024
+Finalized: 4/11/2024
 
 Team Lead: Chelsie Wilson
 Lead Programmer: Jack Elliott
@@ -23,7 +24,7 @@ Compilation Instructions:
 2. Make Active Configuration = Release|Any CPU
 3. Run the project to build it
 4. Naviate to project fold in file directory, then choose bin --> release --> net6.0-windows
-5. Move card image directory 'playingcards' to path above. Please use the playingcards folder included with the project submission, as we have added a card back image
+5. Move card image directory 'playingcards' to path above. Please use the playingcards folder included with the project submission, as we have added two additional images
 6. The .exe will be in the net6.0-windows along with all depedencies
 */
 
@@ -131,9 +132,6 @@ namespace HW_4_CS_4500
                             //Send hand to art dealer, get array of purchased cards
                             bool[] purchasedCards = dealer.appraise(handRank, handSuit);
                            
-                            //Send hand & array of purchased cards to function to add asterisks & print
-                            printHand(handRank, handSuit, purchasedCards);
-
                             //Flip cards that weren't purchased
                             for (int i = 0; i < purchasedCards.Length; i++)
                             {
@@ -148,6 +146,10 @@ namespace HW_4_CS_4500
                             {
                                 patternSolved();
                             }
+
+                            //Send hand & array of purchased cards to function to add asterisks & print
+                            printHand(handRank, handSuit, purchasedCards);
+
                             //Reset all necessary components
                             tBox1.Text = " ";
                             handTrack = 0;
@@ -245,14 +247,26 @@ namespace HW_4_CS_4500
             //If it's the second, output relevant message
             else
             {
-                dealer.solvedPattern();
-                //IMPLEMENT WRITING PATTERN TO LastWon.txt
-                tBoxMsg.Text = "You've solved pattern " + dealer.getPattern().ToString() + "! Now the dealer will use a new criteria...";
+                dealer.solvedPattern(); //This function will write pattern solved to file
+                string x = dealer.getPattern().ToString();
+                tBoxMsg.Text = "You've solved pattern " + x + "! Now the dealer will use a new criteria...";
+                tBoxRecord.AppendText("$--PATTERN " + x + " SOLVED--$");
+                tBoxRecord.AppendText(Environment.NewLine);
 
                 //If the user has solved the final pattern, output relevant message
                 if (dealer.getPattern() == 6)
                 {
-                    tBoxMsg.Text = "You've solved all the patterns! Congratulations!";
+                    tBoxMsg.Text = "YOU'VE SOLVED ALL THE PATTERNS! Congratulations!!";
+                    //Display jokers
+                    var img = Image.FromFile("./playingcards/joker.png");
+                    foreach (PictureBox p in picBoxes)
+                    {
+                        p.Image = img;
+                        p.SizeMode = PictureBoxSizeMode.StretchImage;
+                    }
+                    tBoxRecord.AppendText("$$$$ VICTORY! $$$$");
+                    tBoxRecord.AppendText(Environment.NewLine);
+                    //Reset pattern to zero
                     dealer.setPattern(0);
                     StreamWriter sw = new StreamWriter(filepath, false);
                     sw.WriteLine("0");
