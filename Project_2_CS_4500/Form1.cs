@@ -128,10 +128,23 @@ namespace HW_4_CS_4500
                     if (handTrack == 4)
                     {
                         //Check if the hand is a duplicate
-                        if(!dealer.checkHand(handRank, handSuit)){
+                        if (!dealer.checkHand(handRank, handSuit))
+                        {
                             //Send hand to art dealer, get array of purchased cards
-                            bool[] purchasedCards = dealer.appraise(handRank, handSuit);
-                           
+                            bool[] purchasedCards = new bool[4];
+                            //Pattern 9 needs to be handled individually
+                            tBoxMsg.Text = "The Art Dealer has purchased the face up cards!";
+                            if (dealer.getPattern() == 8)
+                            {
+                                purchasedCards = pattern9(handRank, handSuit);
+                            }  
+                            //Otherwise, we can handle all patterns the same
+                            else
+                            {
+                                purchasedCards = dealer.appraise(handRank, handSuit);
+                                //Send hand & array of purchased cards to function to add asterisks & print
+                                printHand(handRank, handSuit, purchasedCards);
+                            }
                             //Flip cards that weren't purchased
                             for (int i = 0; i < purchasedCards.Length; i++)
                             {
@@ -140,16 +153,13 @@ namespace HW_4_CS_4500
                                     picBoxes[i].Image = Image.FromFile("./playingcards/cardback.png");
                                 }
                             }
-                            tBoxMsg.Text = "The Art Dealer has purchased the face up cards!";
+
                             //Check if the user sucessfully solved a pattern
                             if (dealer.check(purchasedCards))
                             {
                                 patternSolved();
                             }
-
-                            //Send hand & array of purchased cards to function to add asterisks & print
-                            printHand(handRank, handSuit, purchasedCards);
-
+                        
                             //Reset all necessary components
                             tBox1.Text = " ";
                             handTrack = 0;
@@ -164,8 +174,7 @@ namespace HW_4_CS_4500
                             handTrack = 0;
                             bNewHand.Enabled = true;
                             panel1.Enabled = false;
-                        }
-                        
+                        } 
                     }
 
                 }
@@ -233,15 +242,40 @@ namespace HW_4_CS_4500
             appendCardsDealt(output);
         }
 
+        private void pattern9Print(List<bool[]> hands, int[] ranks, int[] suits)
+        {
+            //If the dealer has purchased some combination of the hand, output a header
+            if (hands.Any())
+            {
+                string output = "The dealer would buy " + hands.Count.ToString() + " combination(s) of your cards:\r\n";
+                tBoxRecord.AppendText(output);
+                appendCardsDealt(output);
+                foreach (bool[] hand in hands)
+                {
+                    printHand(ranks, suits, hand);
+                    tBoxRecord.AppendText("\r\n");
+                }
+            }
+            //Otherwise, just output the hand as normal
+            else
+            {
+                bool[] dummyHand = { false, false, false, false };
+                printHand(ranks, suits, dummyHand);
+            }
+        }
+
         //Function for outputting messages to user when they solve a pattern JE
         //Also increments the relevant variables in the ArtDealer object
         //Called by Choose Button function
         void patternSolved()
         {
+            //Sound file from Pixabay: https://pixabay.com/sound-effects/search/victory/
+            System.Media.SoundPlayer sp = new System.Media.SoundPlayer(@"./playingcards/victory.wav");
             //Check if this is the first success on the current pattern
             if (!dealer.checkSuccess())
             {
                 dealer.success();
+                
                 tBoxMsg.Text = "The art dealer has purchased all of your cards! When another full hand is purchased, you will have solved this pattern!";
             }
             //If it's the second, output relevant message
@@ -250,11 +284,13 @@ namespace HW_4_CS_4500
                 dealer.solvedPattern(); //This function will write pattern solved to file
                 string x = dealer.getPattern().ToString();
                 tBoxMsg.Text = "You've solved pattern " + x + "! Now the dealer will use a new criteria...";
-                tBoxRecord.AppendText("$--PATTERN " + x + " SOLVED--$");
+                tBoxRecord.AppendText("\n$--PATTERN " + x + " SOLVED--$");
+                
+                sp.Play();
                 tBoxRecord.AppendText(Environment.NewLine);
 
                 //If the user has solved the final pattern, output relevant message
-                if (dealer.getPattern() == 6)
+                if (dealer.getPattern() == 12)
                 {
                     tBoxMsg.Text = "YOU'VE SOLVED ALL THE PATTERNS! Congratulations!!";
                     //Display jokers
@@ -273,6 +309,119 @@ namespace HW_4_CS_4500
                     sw.Close();
                 }
             }
+        }
+        //Pattern 9. JE
+        //Needs to be handled separately because multiple subcombinations of a hand can be purchased
+        //Called by ChooseButton onClick function
+        //Returns an array of each card purchased
+        //Sends a List of boolean arrays representing all the subcombinations of purchased hands to pattern9print
+        public bool[] pattern9(int[] ranks, int[] suits)
+        {
+            //Constant variable representing the number we are trying to sum to. In the case of HW5, it's 11
+            const int TARGET = 11;
+            int[] newHand = new int[4];
+            //This is used to determine if the user has solved the pattern, i.e if all four cards were bought
+            bool[] overallSuccess = { false, false, false, false };
+            //This list will hold all subcombinations that are purchased
+            List<bool[]> combinations = new List<bool[]>();
+
+            //Convert our ranks to their true values
+            for (int i = 0; i < ranks.Length; i++)
+            {
+                newHand[i] = ranks[i];
+                //Since we store ranks as array elements (starting with element 0 = rank 2), convert to true ranks (as they would appear on the card)
+                newHand[i] += 2;
+                //Convert aces to 1
+                if (newHand[i] == 14)
+                    newHand[i] = 1;
+            }
+
+            bool[] bought = { false, false, false, false };
+            //Internal function used to reset array to all false
+            void resetBought()
+            {
+                for(int i = 0; i < bought.Length; i++)
+                {
+                    bought[i] = false;
+                }
+            }
+            int sum = 0;
+
+            //Iterate through each possible combination of cards
+            for (int i = 0; i < newHand.Length; i++)
+            {
+                //Check sum of all remaining numbers
+                sum = 0;
+                for (int j = i; j < newHand.Length; j++)
+                {
+                    sum += newHand[j];
+                }
+                //If all remaining numbers add to 11, we can add it to the combinations and break the loop
+                //Because any of the remaining subcombinations cannot possibly sum to 11
+                if (sum == TARGET)
+                {
+                    //Flag all positions that were added
+                    for (int j = i; j < newHand.Length; j++)
+                    {
+                        bought[j] = true;
+                        overallSuccess[j] = true;
+                    }
+                    bool[] output = new bool[4];
+                    Array.Copy(bought, output, output.Length);
+                    combinations.Add(output);
+                    break;
+                }
+
+                //Check sum of 3 number combinations. We only have to do this the first iteration
+                if (i == 0)
+                {
+                    //For each element j left after i...
+                    for (int j = i + 1; j < newHand.Length; j++)
+                    {
+                        sum = newHand[i];
+                        //Sum all numbers that aren't in position j
+                        for (int k = i + 1; k < newHand.Length; k++)
+                        {
+                            if (k != j)
+                                sum += newHand[k];
+                        }
+                        if (sum == TARGET)
+                        {
+                            for (int z = i; z < newHand.Length; z++)
+                            {
+                                if (z != j)
+                                    bought[z] = true;
+                                    overallSuccess[z] = true;
+                            }
+                            bool[] output = new bool[4];
+                            Array.Copy(bought, output, output.Length);
+                            combinations.Add(output);
+                            resetBought();
+                        }
+                    }
+                }
+             
+
+                //Check 2 number combinations
+                for (int j = i + 1; j < newHand.Length; j++)
+                {
+                    sum = newHand[i] + newHand[j];
+                    if (sum == TARGET)
+                    {
+                        bought[i] = true;
+                        overallSuccess[i] = true;
+                        overallSuccess[j] = true;
+                        bought[j] = true;
+                        bool[] output = new bool[4];
+                        Array.Copy(bought, output, output.Length);
+                        combinations.Add(output);
+                        resetBought();
+                    }
+                }
+            }
+            //Output all bought combinations
+            pattern9Print(combinations, ranks, suits);
+            return overallSuccess;
         }
 
         //-----------SUIT & RANK BUTTONS--------------------
@@ -614,6 +763,9 @@ namespace HW_4_CS_4500
 
         public bool[] appraise(int[] ranks, int[] suits)
         {
+            //Log the user's hand
+            logHand(ranks, suits);
+
             bool[] cardsBought = new bool[4];
 
             //We can handle patterns 1-5 the same way
@@ -623,40 +775,122 @@ namespace HW_4_CS_4500
                 {
                     cardsBought[i] = pattern1to5(ranks[i], suits[i]);
                 }
-
-                //Add the hand to the List
-                logHand(ranks, suits);
-
                 return cardsBought;
             }
             //Pattern 6 needs to be handled on its own
-            else
+            else if (pattern == 5)
             {
-                int max = ranks[0];
-
-                //Find max rank
-                for (int j = 0; j < ranks.Length; j++)
-                {
-                    if (max < ranks[j])
-                        max = ranks[j];
-                }
-
-                //Buy all cards that equal max rank
-                for (int i = 0; i < ranks.Length; i++)
-                {
-                    if (ranks[i] == max)
-                        cardsBought[i] = true;
-                    else
-                        cardsBought[i] = false;
-                }
+                cardsBought = pattern6(ranks, suits);
                 //Add the hand to the List
                 logHand(ranks, suits);
-
                 return cardsBought;
             }
+            //As does 7
+            else if (pattern == 6)
+            {
+                cardsBought = pattern7(ranks, suits);
+                return cardsBought;
+            }
+            //And 8
+            else if(pattern == 7)
+            {
+                cardsBought = pattern8(ranks);
+                return cardsBought;
+            }
+            else
+                return cardsBought;
         }
 
+        //PATTERN 6: THE HIGHEST RANK 
+        private bool[] pattern6(int[] r, int[] s)
+        {
+            bool[] bought = new bool[4];
+            int max = r[0];
 
+            //Find max rank
+            for (int j = 0; j < r.Length; j++)
+            {
+                if (max < r[j])
+                    max = r[j];
+            }
+
+            //Buy all cards that equal max rank
+            for (int i = 0; i < r.Length; i++)
+            {
+                if (r[i] == max)
+                    bought[i] = true;
+                else
+                    bought[i] = false;
+            }
+            return bought;
+        }
+
+        //PATTERN 7: ASCENDING RUN IN SAME SUIT
+        private bool[] pattern7(int[] r, int[] s)
+        {
+            //Either we buy all cards, or none, so start with none, in case we hit one of many failure conditions
+            bool[] bought = { false, false, false, false };
+            int suit = s[0];
+
+            //If the first card is higher than a Jack, an ascending run is not possible
+            if (r[0] > 9)
+                return bought;
+
+            //Check if all the suits are the same. If any are different, none of the cards are bought
+            foreach (int i in s)
+            {
+                if (i != suit)
+                {
+                    return bought;
+                }
+            }
+
+            //Finally, we can check if the ranks are in ascending order
+            int rank = r[0];
+
+            for (int j = 1; j < r.Length; j++)
+            {
+                if ((rank + 1) != r[j])
+                    return bought;
+
+                rank++;
+            }
+
+            //If we've made it to this stage, the hand is an ascending run in the same suit. Buy all cards
+            for (int j = 0; j < bought.Length; j++)
+            {
+                bought[j] = true;
+            }
+            return bought;
+        }
+        //PATTERN 8: SKIPPING BY 2, ANY SUIT
+        private bool[] pattern8(int[] ranks)
+        {
+            //Either all cards are bought, or none, so we will start with none
+            bool[] bought = { false, false, false, false };
+            //Sort ranks
+            int[] r = new int[4];
+            Array.Copy(ranks, r, r.Length);
+            Array.Sort(r);
+
+            //Determine if each rank differs by two
+            int start = r[0];
+            for (int j = 1; j < r.Length; j++)
+            {
+                //Return the all-false array if a rank doesn't skip by 2
+                if (r[j] != (start + 2))
+                    return bought;
+
+                start += 2;
+            }
+
+            //If we've made it to this point, the hand fits the pattern
+            for (int j = 0; j < bought.Length; j++)
+            {
+                bought[j] = true;
+            }
+            return bought;
+        }
         //Contains patterns 1-5
         private bool pattern1to5(int rank, int suit)
         {
