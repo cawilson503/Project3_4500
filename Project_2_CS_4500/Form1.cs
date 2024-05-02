@@ -136,9 +136,11 @@ namespace HW_4_CS_4500
                             tBoxMsg.Text = "The Art Dealer has purchased the face up cards!";
                             if (dealer.getPattern() == 8)
                             {
+                                //Send hand to pattern 9 function and log it
                                 purchasedCards = pattern9(handRank, handSuit);
+                                dealer.logHand(handRank, handSuit);
                             }  
-                            //Otherwise, we can handle all patterns the same
+                            //Otherwise, we can handle the rest of the patterns the same
                             else
                             {
                                 purchasedCards = dealer.appraise(handRank, handSuit);
@@ -247,13 +249,14 @@ namespace HW_4_CS_4500
             //If the dealer has purchased some combination of the hand, output a header
             if (hands.Any())
             {
-                string output = "The dealer would buy " + hands.Count.ToString() + " combination(s) of your cards:\r\n";
+                string output = "The dealer would buy " + hands.Count.ToString() + " combination(s) of your cards:";
                 tBoxRecord.AppendText(output);
+                tBoxRecord.AppendText(Environment.NewLine);
                 appendCardsDealt(output);
                 foreach (bool[] hand in hands)
                 {
                     printHand(ranks, suits, hand);
-                    tBoxRecord.AppendText("\r\n");
+                    tBoxRecord.AppendText(Environment.NewLine);
                 }
             }
             //Otherwise, just output the hand as normal
@@ -271,6 +274,7 @@ namespace HW_4_CS_4500
         {
             //Sound file from Pixabay: https://pixabay.com/sound-effects/search/victory/
             System.Media.SoundPlayer sp = new System.Media.SoundPlayer(@"./playingcards/victory.wav");
+            sp.Play();
             //Check if this is the first success on the current pattern
             if (!dealer.checkSuccess())
             {
@@ -284,11 +288,12 @@ namespace HW_4_CS_4500
                 dealer.solvedPattern(); //This function will write pattern solved to file
                 string x = dealer.getPattern().ToString();
                 tBoxMsg.Text = "You've solved pattern " + x + "! Now the dealer will use a new criteria...";
-                tBoxRecord.AppendText("\n$--PATTERN " + x + " SOLVED--$");
-                
-                sp.Play();
+                string output = "$--PATTERN " + x + " SOLVED--$";
                 tBoxRecord.AppendText(Environment.NewLine);
-
+                tBoxRecord.AppendText(output);
+                appendCardsDealt(output);
+                
+                
                 //If the user has solved the final pattern, output relevant message
                 if (dealer.getPattern() == 12)
                 {
@@ -310,6 +315,7 @@ namespace HW_4_CS_4500
                 }
             }
         }
+
         //Pattern 9. JE
         //Needs to be handled separately because multiple subcombinations of a hand can be purchased
         //Called by ChooseButton onClick function
@@ -719,7 +725,7 @@ namespace HW_4_CS_4500
         }
 
         //Adds a hand to the List of past hands, to check for duplicates JE
-        private void logHand(int[] ranks, int[] suits)
+        public void logHand(int[] ranks, int[] suits)
         {
            //New array that will hold combined ranks/suits
             int[] a = new int[4];
