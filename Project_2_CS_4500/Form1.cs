@@ -340,6 +340,9 @@ namespace HW_4_CS_4500
                 //Convert aces to 1
                 if (newHand[i] == 14)
                     newHand[i] = 1;
+                //Jacks are now 11, aka the target number, so set them above the target to invalidate them
+                if (newHand[i] == 11)
+                    newHand[i] = 14;
             }
 
             bool[] bought = { false, false, false, false };
@@ -781,30 +784,39 @@ namespace HW_4_CS_4500
                 {
                     cardsBought[i] = pattern1to5(ranks[i], suits[i]);
                 }
-                return cardsBought;
+                
             }
-            //Pattern 6 needs to be handled on its own
+            //From here on out, patterns need their own function to handle them
+            //Should I have made this a switch statement? Probably \_(-_-)_/
             else if (pattern == 5)
             {
                 cardsBought = pattern6(ranks, suits);
-                //Add the hand to the List
-                logHand(ranks, suits);
-                return cardsBought;
+                
             }
-            //As does 7
+            //Pattern 7
             else if (pattern == 6)
             {
                 cardsBought = pattern7(ranks, suits);
-                return cardsBought;
             }
-            //And 8
+            //Pattern 8
             else if(pattern == 7)
             {
                 cardsBought = pattern8(ranks);
-                return cardsBought;
+            }
+            //Pattern 10. Pattern 9 is handled in main
+            else if(pattern == 9)
+            {
+                cardsBought = pattern10(ranks);
+            }
+            //Pattern 11
+            else if(pattern == 10)
+            {
+                cardsBought = pattern11(ranks, suits);
             }
             else
                 return cardsBought;
+
+            return cardsBought;
         }
 
         //PATTERN 6: THE HIGHEST RANK 
@@ -831,7 +843,7 @@ namespace HW_4_CS_4500
             return bought;
         }
 
-        //PATTERN 7: ASCENDING RUN IN SAME SUIT
+        //PATTERN 7: ASCENDING RUN IN SAME SUIT JE
         private bool[] pattern7(int[] r, int[] s)
         {
             //Either we buy all cards, or none, so start with none, in case we hit one of many failure conditions
@@ -869,7 +881,7 @@ namespace HW_4_CS_4500
             }
             return bought;
         }
-        //PATTERN 8: SKIPPING BY 2, ANY SUIT
+        //PATTERN 8: SKIPPING BY 2, ANY SUIT JE
         private bool[] pattern8(int[] ranks)
         {
             //Either all cards are bought, or none, so we will start with none
@@ -897,6 +909,71 @@ namespace HW_4_CS_4500
             }
             return bought;
         }
+
+        //PATTERN 10: DEAD MAN'S HAND, ACES & EIGHTS JE
+        private bool[] pattern10(int[] ranks)
+        {
+            int eightCount = 0;
+            int aceCount = 0;
+
+            //This will count if we have exactly 2 Aces and Eights, regardless of order/suit
+            for (int i = 0; i < ranks.Length; i++)
+            {
+                if (ranks[i] == 6)
+                    eightCount++;
+                if (ranks[i] == 12)
+                    aceCount++;
+            }
+            //If we do, buy all cards
+            if (eightCount == 2 && aceCount == 2)
+            {
+                bool[] bought = { true, true, true, true };
+                return bought;
+            }
+            //Otherwise, buy none
+            else
+            {
+                bool[] bought = { false, false, false, false };
+                return bought;
+            }
+        }
+        //PATTERN 11: ROYAL FLUSH
+        private bool[] pattern11(int[] ranks, int[] suits)
+        {
+            int suitCheck = suits[0];
+            bool[] notBought = {false, false, false, false }; 
+            //Check if all cards are the same suit
+            for (int i = 1; i < suits.Length; i++)
+            {
+                if (suitCheck != suits[i])
+                    return notBought;
+            }
+
+            //Check if we have ace, king, queen, jack
+            int[] sorted = new int[4];
+
+            Array.Copy(ranks, sorted, ranks.Length);
+            Array.Sort(sorted);
+
+            //If the sorted array doesn't start with a Jack, we can bail here.
+            //9 is a bit of a magic number here, but refer to the comments at the top of this object to see how array elements correspond to ranks
+            if (sorted[0] != 9)
+                return notBought;
+
+            int counter = sorted[0];
+            for (int i = 1; i < sorted.Length; i++)
+            {
+                counter += 1;
+                if (counter != sorted[i])
+                    return notBought;
+            }
+
+            //If we've made it to this stage, the hand is a royal flush
+
+            bool[] bought = { true, true, true, true };
+            return bought;
+        }
+
         //Contains patterns 1-5
         private bool pattern1to5(int rank, int suit)
         {
