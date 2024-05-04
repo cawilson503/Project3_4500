@@ -318,7 +318,7 @@ namespace HW_4_CS_4500
 
         //Pattern 9. JE
         //Needs to be handled separately because multiple subcombinations of a hand can be purchased
-        //Called by ChooseButton onClick function
+        //Called by Choose button onClick function
         //Returns an array of each card purchased
         //Sends a List of boolean arrays representing all the subcombinations of purchased hands to pattern9print
         public bool[] pattern9(int[] ranks, int[] suits)
@@ -340,7 +340,7 @@ namespace HW_4_CS_4500
                 //Convert aces to 1
                 if (newHand[i] == 14)
                     newHand[i] = 1;
-                //Jacks are now 11, aka the target number, so set them above the target to invalidate them
+                //Jacks are now 11, aka the target number, so set them above the target to invalidate them so they aren't purchased
                 if (newHand[i] == 11)
                     newHand[i] = 14;
             }
@@ -653,6 +653,8 @@ namespace HW_4_CS_4500
         //Used for pattern checking. See the above comment for what these numbers (array elements) correspond to
         int[] faceCards = { 9, 10, 11 };
         int[] primes = { 0, 1, 3, 5 };
+        bool[] boughtAll = { true, true, true, true };
+        bool[] boughtNone = { false, false, false, false };
 
         //Constructor for ArtDealer
         public ArtDealer()
@@ -690,19 +692,19 @@ namespace HW_4_CS_4500
             return pattern;
         }
 
-        //Used to track that the user has succeeded in the current pattern
+        //Used to track that the user has succeeded in the current pattern JE
         public void success()
         {
             currentSuccess = true;
         }
 
-        //Checks if the user has already succeed once on the current pattern
+        //Checks if the user has already succeed once on the current pattern JE
         public bool checkSuccess()
         {
             return currentSuccess;
         }
 
-        //Called when user solves a pattern (2 successes)
+        //Called when user solves a pattern (2 successes) JE
         public void solvedPattern()
         {
             pattern++;
@@ -717,6 +719,7 @@ namespace HW_4_CS_4500
             currentSuccess = false;
         }
 
+        //Checks if the user's hand has all been purchased. Called by Choose button onClick function JE
         public bool check(bool[] hand)
         {
             foreach(bool b in hand)
@@ -746,6 +749,8 @@ namespace HW_4_CS_4500
             pastHands.Add(a);
         }
 
+        //Checks if the user's hand has been already selected this pattern JE
+        //Called by Choose button onClick function
         public bool checkHand(int[] ranks, int[] suits)
         {
             //New array that will hold combined ranks/suits
@@ -769,7 +774,7 @@ namespace HW_4_CS_4500
         }
 
 
-
+        //Called by Choose Button onClick function. Determines which cards should be purchased based on the current pattern
         public bool[] appraise(int[] ranks, int[] suits)
         {
             //Log the user's hand
@@ -789,32 +794,22 @@ namespace HW_4_CS_4500
             //From here on out, patterns need their own function to handle them
             //Should I have made this a switch statement? Probably \_(-_-)_/
             else if (pattern == 5)
-            {
                 cardsBought = pattern6(ranks, suits);
-                
-            }
             //Pattern 7
             else if (pattern == 6)
-            {
                 cardsBought = pattern7(ranks, suits);
-            }
             //Pattern 8
             else if(pattern == 7)
-            {
                 cardsBought = pattern8(ranks);
-            }
             //Pattern 10. Pattern 9 is handled in main
             else if(pattern == 9)
-            {
                 cardsBought = pattern10(ranks);
-            }
             //Pattern 11
             else if(pattern == 10)
-            {
                 cardsBought = pattern11(ranks, suits);
-            }
+            //Pattern 12
             else
-                return cardsBought;
+                cardsBought = pattern12(ranks, suits);
 
             return cardsBought;
         }
@@ -847,19 +842,18 @@ namespace HW_4_CS_4500
         private bool[] pattern7(int[] r, int[] s)
         {
             //Either we buy all cards, or none, so start with none, in case we hit one of many failure conditions
-            bool[] bought = { false, false, false, false };
             int suit = s[0];
 
             //If the first card is higher than a Jack, an ascending run is not possible
             if (r[0] > 9)
-                return bought;
+                return boughtNone;
 
             //Check if all the suits are the same. If any are different, none of the cards are bought
             foreach (int i in s)
             {
                 if (i != suit)
                 {
-                    return bought;
+                    return boughtNone;
                 }
             }
 
@@ -869,23 +863,17 @@ namespace HW_4_CS_4500
             for (int j = 1; j < r.Length; j++)
             {
                 if ((rank + 1) != r[j])
-                    return bought;
+                    return boughtNone;
 
                 rank++;
             }
 
             //If we've made it to this stage, the hand is an ascending run in the same suit. Buy all cards
-            for (int j = 0; j < bought.Length; j++)
-            {
-                bought[j] = true;
-            }
-            return bought;
+            return boughtAll;
         }
         //PATTERN 8: SKIPPING BY 2, ANY SUIT JE
         private bool[] pattern8(int[] ranks)
         {
-            //Either all cards are bought, or none, so we will start with none
-            bool[] bought = { false, false, false, false };
             //Sort ranks
             int[] r = new int[4];
             Array.Copy(ranks, r, r.Length);
@@ -897,17 +885,13 @@ namespace HW_4_CS_4500
             {
                 //Return the all-false array if a rank doesn't skip by 2
                 if (r[j] != (start + 2))
-                    return bought;
+                    return boughtNone;
 
                 start += 2;
             }
 
             //If we've made it to this point, the hand fits the pattern
-            for (int j = 0; j < bought.Length; j++)
-            {
-                bought[j] = true;
-            }
-            return bought;
+            return boughtAll;
         }
 
         //PATTERN 10: DEAD MAN'S HAND, ACES & EIGHTS JE
@@ -926,27 +910,20 @@ namespace HW_4_CS_4500
             }
             //If we do, buy all cards
             if (eightCount == 2 && aceCount == 2)
-            {
-                bool[] bought = { true, true, true, true };
-                return bought;
-            }
+                return boughtAll;
             //Otherwise, buy none
             else
-            {
-                bool[] bought = { false, false, false, false };
-                return bought;
-            }
+                return boughtNone;
         }
         //PATTERN 11: ROYAL FLUSH
         private bool[] pattern11(int[] ranks, int[] suits)
         {
             int suitCheck = suits[0];
-            bool[] notBought = {false, false, false, false }; 
             //Check if all cards are the same suit
             for (int i = 1; i < suits.Length; i++)
             {
                 if (suitCheck != suits[i])
-                    return notBought;
+                    return boughtNone;
             }
 
             //Check if we have ace, king, queen, jack
@@ -958,20 +935,62 @@ namespace HW_4_CS_4500
             //If the sorted array doesn't start with a Jack, we can bail here.
             //9 is a bit of a magic number here, but refer to the comments at the top of this object to see how array elements correspond to ranks
             if (sorted[0] != 9)
-                return notBought;
+                return boughtNone;
 
             int counter = sorted[0];
             for (int i = 1; i < sorted.Length; i++)
             {
                 counter += 1;
                 if (counter != sorted[i])
-                    return notBought;
+                    return boughtNone;
             }
 
             //If we've made it to this stage, the hand is a royal flush
+            return boughtAll;
+        }
 
-            bool[] bought = { true, true, true, true };
-            return bought;
+        //PATTERN 12: TWO BLACKJACKS JE
+        private bool[] pattern12(int[] ranks, int[] suits)
+        {
+            bool clubCheck = false;
+            bool spadeCheck = false;
+            int aceCount = 0;
+
+            //Parse the hand for relevant cards: both black Jacks and  two aces
+            for (int i = 0; i < ranks.Length; i++)
+            {
+                if (ranks[i] == 12)
+                {
+                    aceCount++;
+                    continue;
+                }
+
+                //These numbers represent where Jack and Spade are stored in their respective arrays
+                //Refer to the comments at the top of this object
+                if (ranks[i] == 9 && suits[i] == 0)
+                {
+                    spadeCheck = true;
+                    continue;
+                }
+
+                if (ranks[i] == 9 && suits[i] == 1)
+                {
+                    clubCheck = true;
+                }
+                    
+            }
+
+            //If we meet the requirements, buy all cards
+            if (clubCheck && spadeCheck && aceCount == 2)
+            {
+                return boughtAll;
+            }
+            //Otherwise, buy none
+            else
+            {
+                return boughtNone;
+            }
+
         }
 
         //Contains patterns 1-5
