@@ -51,12 +51,14 @@ namespace HW_4_CS_4500
                 //If something goes wrong with the read, we will just start from scratch    
                 catch
                 {
+                    
                     this.Close();
                 }
                 sr.Close();                
             }
             else
             {
+                File.Create(filepath).Close();
                 bStart.Visible = true;
             }
         }
