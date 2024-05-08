@@ -2,7 +2,7 @@
  * The program will show the images of four playing cards chosen by the user. 
  * The cards will then be appraised by an "art dealer" and some of them may be purchased.
  * Try to find the pattern that the art dealer is following! After the Art Dealer has purchased two full hands, the pattern will change.
- * There are six in total, try to find them all!
+ * There are twelve in total, try to find them all!
  * The program should also append the cards drawn categorized by date to a text file and scrollable textbox, visible in the program. The date should be in MM/DD/YYYY format. 
  
 Group 4 consists of Jack Elliott, Haley Laguna, Jonny Stadter, Paul Williams, and Chelsie Wilson.
