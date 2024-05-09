@@ -6,6 +6,7 @@
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyName>HW_4_CS_4500</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>

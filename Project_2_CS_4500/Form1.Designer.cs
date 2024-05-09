@@ -1,9 +1,9 @@
 ﻿using System.Windows.Forms;
 using System.Xml.Linq;
 
-namespace Project_2_CS_4500
+namespace HW_4_CS_4500
 {
-    partial class Project2
+    partial class HW4
     {
         /// <summary>
         ///  Required designer variable.
@@ -31,7 +31,7 @@ namespace Project_2_CS_4500
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Project2));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(HW4));
             pictureBox1 = new PictureBox();
             pictureBox2 = new PictureBox();
             pictureBox3 = new PictureBox();
